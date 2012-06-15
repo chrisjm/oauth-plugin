@@ -44,7 +44,11 @@ module OAuth
           if @strategies.include?(:interactive) && interactive
             true
           elsif !(@strategies & env["oauth.strategies"].to_a).empty?
-            @controller.send :current_user=, token.user if token
+            if two_legged
+              @controller.send :current_user=, client_application.user if client_application
+            else
+              @controller.send :current_user=, token.user if token
+            end
             true
           else
             if @strategies.include?(:interactive)
